@@ -40,6 +40,17 @@
     (map (fn [subs] (apply assoc coordinates (interleave wild-indices subs)))
          substitutions)))
 
+(defn lookup-select [arena coordinates]
+  (map #(lookup arena %)
+       (interpret-wildcard-coordinates coordinates (count arena))))
+
+(defn write-select [arena coordinates values]
+  (let [locations (interpret-wildcard-coordinates coordinates (count arena))]
+    (reduce (fn [arena-state [location value]]
+              (write arena-state location value))
+            arena
+            (map vector locations values))))
+
 (defn squash [done todo]
   (if (<= (count todo) 1)
     (concat done todo)
