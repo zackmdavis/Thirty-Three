@@ -12,3 +12,7 @@
   (is (= (lookup (write (clean-n-arena 3 4) [1 2 3] :x)
                  [1 2 3])
          :x)))
+
+(deftest can-interpret-wildcard-coordinates
+  (is (= (interpret-wildcard-coordinates [0 :* 2 :*] 2)
+         [[0 0 2 0] [0 0 2 1] [0 1 2 0] [0 1 2 1]])))

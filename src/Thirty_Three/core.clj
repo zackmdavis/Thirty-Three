@@ -1,4 +1,5 @@
-(ns Thirty-Three.core)
+(ns Thirty-Three.core
+  (:require [clojure.math.combinatorics :refer [cartesian-product]]))
 
 (defmacro clean-n-arena [n arena-size]
   "Create an n-dimensional vector-of-vectors-of-&c. with side length
@@ -30,6 +31,14 @@
     1 (one-write arena coordinates value)
     2 (two-write arena coordinates value)
     3 (three-write arena coordinates value)))
+
+(defn interpret-wildcard-coordinates [coordinates arena-size]
+  (let [wild-indices (filter identity (map-indexed (fn [i c] (if (#{:*} c) i))
+                                                   coordinates))
+        substitutions (apply cartesian-product
+                            (repeat (count wild-indices) (range arena-size)))]
+    (map (fn [subs] (apply assoc coordinates (interleave wild-indices subs)))
+         substitutions)))
 
 (defn squash [done todo]
   (if (<= (count todo) 1)
