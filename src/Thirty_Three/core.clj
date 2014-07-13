@@ -12,10 +12,24 @@
 (def two-arena (clean-n-arena 2 4))
 (def the-arena (clean-n-arena 3 4))
 
-(defn lookup [arena & coordinates]
+(defn lookup [arena coordinates]
   (reduce (fn [arena-slice coordinate] (arena-slice coordinate))
           arena coordinates))
 
+;; XXX retarded
+(defn one-write [arena [x] value]
+  (assoc arena x value))
+(defn two-write [arena [x y] value]
+  (assoc arena x (assoc (arena x) y value)))
+(defn three-write [arena [x y z] value]
+  (assoc arena x (assoc (arena x) y (assoc ((arena x) y) z value))))
+
+;; TODO: generalize
+(defn write [arena coordinates value]
+  (condp = (count coordinates)
+    1 (one-write arena coordinates value)
+    2 (two-write arena coordinates value)
+    3 (three-write arena coordinates value)))
 
 (defn squash [done todo]
   (if (<= (count todo) 1)
