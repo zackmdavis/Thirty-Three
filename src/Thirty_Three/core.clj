@@ -4,7 +4,7 @@
   "Create an n-dimensional vector-of-vectors-of-&c. with side length
    arena-size"
   (if (= n 0)
-    :_
+    nil
     `(vec (for [_# (range ~arena-size)]
             (clean-n-arena ~(dec n) ~arena-size)))))
 
@@ -15,6 +15,7 @@
 (defn lookup [arena & coordinates]
   (reduce (fn [arena-slice coordinate] (arena-slice coordinate))
           arena coordinates))
+
 
 (defn squash [done todo]
   (if (<= (count todo) 1)
@@ -27,12 +28,12 @@
       (squash (concat done collision-outcome) still-todo))))
 
 (defn slide-line [line direction]
-  (let [blocks (filter #(not= % :_) line)
+  (let [blocks (filter #(not= % nil) line)
         squashed (condp = direction
                    :back (squash [] blocks)
                    :forward (squash [] (reverse blocks)))
         size (count line)
-        padding (repeat (- size (count squashed)) :_)]
+        padding (repeat (- size (count squashed)) nil)]
     (condp = direction
       :back (vec (concat squashed padding))
       :forward (vec (concat padding squashed)))))

@@ -3,5 +3,5 @@
             [Thirty-Three.core :refer :all]))
 
 (deftest can-slide-line
-  (is (= (slide-line [2 :_ 2 :_] :back) [3 :_ :_ :_]))
-  (is (= (slide-line [3 :_ 2 2] :forward) [:_ :_ 3 3])))
+  (is (= (slide-line [2 nil 2 nil] :back) [3 nil nil nil]))
+  (is (= (slide-line [3 nil 2 2] :forward) [nil nil 3 3])))
