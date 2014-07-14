@@ -5,6 +5,9 @@
 (def marked-two-arena
   [[:a :b :c] [:d :e :f] [:g :h :i]])
 
+(def realist-two-arena
+  [[nil nil 1 nil] [nil nil 1 nil] [nil nil nil nil] [2 nil 1 1]])
+
 (deftest can-slide-line
   (is (= (slide-line [2 nil 2 nil] :back) [3 nil nil nil]))
   (is (= (slide-line [3 nil 2 2] :forward) [nil nil 3 3])))
@@ -27,3 +30,15 @@
 (deftest can-write-select
   (is (= (write-select marked-two-arena [:* 0] [:x :y :z])
          [[:x :b :c] [:y :e :f] [:z :h :i]])))
+
+(deftest can-insert-into-seq-at
+  (is (= (insert-into-seq-at :x (range 5) 2)
+         [0 1 :x 2 3 4])))
+
+(deftest can-compute-slicing-coordinates
+  (is (= (slicing-coordinates 1 2 4)
+         [[0 :*] [1 :*] [2 :*] [3 :*]]))
+  (is (= (slicing-coordinates 0 3 3)
+         [[:* 0 0] [:* 0 1] [:* 0 2]
+          [:* 1 0] [:* 1 1] [:* 1 2]
+          [:* 2 0] [:* 2 1] [:* 2 2]])))

@@ -72,3 +72,12 @@
       :back (vec (concat squashed padding))
       :forward (vec (concat padding squashed)))))
 
+(defn insert-into-seq-at [insertion sequence index]
+  (let [[start finish] (split-at index sequence)]
+    (concat start [insertion] finish)))
+
+(defn slicing-coordinates [slicing-dimension n arena-size]
+  (let [bound-coordinates (apply cartesian-product 
+                                 (repeat (dec n) (range arena-size)))]
+    (map #(insert-into-seq-at :* % slicing-dimension) bound-coordinates)))
+
