@@ -42,3 +42,9 @@
          [[:* 0 0] [:* 0 1] [:* 0 2]
           [:* 1 0] [:* 1 1] [:* 1 2]
           [:* 2 0] [:* 2 1] [:* 2 2]])))
+
+(deftest can-slide-arena
+  (is (= [[nil nil nil 1] [nil nil nil 1] [nil nil nil nil] [nil nil 2 2]]
+         (slide-arena realist-two-arena 1 2 :forward)))
+  (is (= [[2 nil 2 1] [nil nil 1 nil] [nil nil nil nil] [nil nil nil nil]]
+         (slide-arena realist-two-arena 0 2 :back))))

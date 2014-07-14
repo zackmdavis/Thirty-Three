@@ -79,5 +79,14 @@
 (defn slicing-coordinates [slicing-dimension n arena-size]
   (let [bound-coordinates (apply cartesian-product 
                                  (repeat (dec n) (range arena-size)))]
-    (map #(insert-into-seq-at :* % slicing-dimension) bound-coordinates)))
+    (map #(vec (insert-into-seq-at :* % slicing-dimension)) bound-coordinates)))
 
+(defn slide-arena [arena sliding-dimension n direction]
+  (let [line-coordinates (slicing-coordinates sliding-dimension n (count arena))
+        lines (map #(lookup-select arena %) line-coordinates)
+        slid-lines (map #(slide-line % direction) lines)
+        coordinates-and-new (map vector line-coordinates slid-lines)]
+    (reduce (fn [arena-state [line-coordinate slid-line]]
+              (write-select arena-state line-coordinate slid-line))
+            arena
+            coordinates-and-new)))
