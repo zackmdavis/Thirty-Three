@@ -90,3 +90,11 @@
               (write-select arena-state line-coordinate slid-line))
             arena
             coordinates-and-new)))
+
+(defn vacancies [arena n]
+ (filter #(not (lookup arena %))
+         (apply cartesian-product (repeat n (range (count arena))))))
+  
+(defn fill-vacancy [arena n]
+  (let [positions (vacancies arena n)]
+    (write arena (rand-nth positions) 1)))

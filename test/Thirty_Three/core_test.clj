@@ -48,3 +48,9 @@
          (slide-arena realist-two-arena 1 2 :forward)))
   (is (= [[2 nil 2 1] [nil nil 1 nil] [nil nil nil nil] [nil nil nil nil]]
          (slide-arena realist-two-arena 0 2 :back))))
+
+(deftest can-report-vacancies
+  (is (= [[0 0] [0 1] [0 3] [1 0] [1 1] [1 3] [2 0] [2 1] [2 2] [2 3] [3 1]] 
+         (vacancies realist-two-arena 2))))
+         
+  
