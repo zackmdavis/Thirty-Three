@@ -1,5 +1,6 @@
 (ns Thirty-Three.terminal-demo
-  (:require [Thirty-Three.core :refer :all]))
+  (:require [Thirty-Three.core :refer :all])
+  (:import jline.Terminal))
 
 (def demo-two-arena-atom (atom (clean-n-arena 2 4)))
 (swap! demo-two-arena-atom #(write % [0 0] 1))
@@ -39,7 +40,9 @@
 
 (defn game-loop [arena-atom actions display]
   (display @arena-atom)
-  (let [action (actions (keyword (clojure.string/upper-case (read-line))))]
+  (let [terminal (Terminal/getTerminal)
+        action (actions (keyword (clojure.string/upper-case
+                                  (char (.readCharacter terminal System/in)))))]
     (when action
       (swap! arena-atom action)
       (swap! arena-atom fill-vacancy))
