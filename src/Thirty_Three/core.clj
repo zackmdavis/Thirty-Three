@@ -1,13 +1,7 @@
 (ns Thirty-Three.core
-  (:require [clojure.math.combinatorics :refer [cartesian-product]]))
-
-(defmacro clean-n-arena [n arena-size]
-  "Create an n-dimensional vector-of-vectors-of-&c. with side length
-   arena-size"
-  (if (= n 0)
-    nil
-    `(vec (for [_# (range ~arena-size)]
-            (clean-n-arena ~(dec n) ~arena-size)))))
+  (:require [Thirty-Three.combinatorics-library :refer [cartesian-product]])
+  ;(:require-macros [Thirty-Three.macro-library :as macros])
+)
 
 (defn lookup [arena coordinates]
   (reduce (fn [arena-slice coordinate] (arena-slice coordinate))
