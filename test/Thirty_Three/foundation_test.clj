@@ -1,6 +1,7 @@
-(ns Thirty-Three.core-test
+(ns Thirty-Three.foundation-test
   (:require [clojure.test :refer :all]
-            [Thirty-Three.core :refer :all]))
+            [Thirty-Three.foundation :refer :all]
+            [Thirty-Three.macro-library :refer :all]))
 
 (def marked-two-arena
   [[:a :b :c] [:d :e :f] [:g :h :i]])

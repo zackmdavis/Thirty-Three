@@ -8,8 +8,8 @@ pom.xml.asc
 /.lein-*
 /.nrepl-port
 
-# copied with different extension, to be compiled
-src/Thirty_Three/core.cljs
+# copies with different extension created by build script, to be compiled
+src/Thirty_Three/foundation.cljs
 src/Thirty_Three/combinatorics_library.cljs
 
 # compiled

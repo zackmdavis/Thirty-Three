@@ -1,7 +1,5 @@
-(ns Thirty-Three.core
-  (:require [Thirty-Three.combinatorics-library :refer [cartesian-product]])
-  ;(:require-macros [Thirty-Three.macro-library :as macros])
-)
+(ns Thirty-Three.foundation
+  (:require [Thirty-Three.combinatorics-library :refer [cartesian-product]]))
 
 (defn lookup [arena coordinates]
   (reduce (fn [arena-slice coordinate] (arena-slice coordinate))
@@ -104,3 +102,5 @@
 (defn fill-vacancy [arena]
   (let [positions (vacancies arena)]
     (write arena (rand-nth positions) 1)))
+
+;(.log js/console "Hello ClojureScript World from foundation.clj[s]!") ; buildscript: cljs
