@@ -5,12 +5,12 @@
 (def marked-two-arena
   [[:a :b :c] [:d :e :f] [:g :h :i]])
 
-(def realist-two-arena
+(def realist-two-arena-a
   [[nil nil 1 nil] [nil nil 1 nil] [nil nil nil nil] [2 nil 1 1]])
 
-(deftest can-slide-line
-  (is (= (slide-line [2 nil 2 nil] :back) [3 nil nil nil]))
-  (is (= (slide-line [3 nil 2 2] :forward) [nil nil 3 3])))
+(deftest can-squash
+  (is (= [2 2]
+         (squash [] [2 1 1]))))
 
 (deftest can-write
   (is (= (write (clean-n-arena 2 2) [1 1] :a)
@@ -43,14 +43,6 @@
           [:* 1 0] [:* 1 1] [:* 1 2]
           [:* 2 0] [:* 2 1] [:* 2 2]])))
 
-(deftest can-slide-arena
-  (is (= [[nil nil nil 1] [nil nil nil 1] [nil nil nil nil] [nil nil 2 2]]
-         (slide-arena realist-two-arena 1 2 :forward)))
-  (is (= [[2 nil 2 1] [nil nil 1 nil] [nil nil nil nil] [nil nil nil nil]]
-         (slide-arena realist-two-arena 0 2 :back))))
-
 (deftest can-report-vacancies
   (is (= [[0 0] [0 1] [0 3] [1 0] [1 1] [1 3] [2 0] [2 1] [2 2] [2 3] [3 1]] 
-         (vacancies realist-two-arena 2))))
-         
-  
+         (vacancies realist-two-arena-a 2))))

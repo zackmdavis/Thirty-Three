@@ -52,26 +52,33 @@
             (map vector locations values))))
 
 (defn squash [done todo]
-  (if (<= (count todo) 1)
-    (concat done todo)
-    (let [[this-collision still-todo] (map vec (split-at 2 todo))
-          collision-outcome (if (= (first this-collision)
-                                   (second this-collision))
-                              [(inc (first this-collision))]
-                              this-collision)]
-      (squash (concat done collision-outcome) still-todo))))
+  (if (empty? todo)
+    done
+    (if (= (last done) (first todo))
+      (recur (assoc done (dec (count done)) (inc (first todo)))
+             (rest todo))
+      (recur (conj done (first todo)) (rest todo)))))
+
+(defn accumulate [blocks]
+  (reduce (fn [done incoming]
+            (if (= (last done) incoming)
+              (assoc done (dec (count done)) (inc incoming))
+              (conj done incoming)))
+          []
+          blocks))
+
+(defn nullspace [blocks arena-size side]
+  (let [space (repeat (- arena-size (count blocks)) nil)]
+    (condp = side
+      :start (concat space blocks)
+      :end (concat blocks space)))) 
 
 (defn slide-line [line direction]
-  (let [blocks (filter #(not= % nil) line)
-        squashed (condp = direction
-                   :back (squash [] blocks)
-                   :forward (squash [] (reverse blocks)))
-        size (count line)
-        padding (repeat (- size (count squashed)) nil)]
+  (let [blocks (filter identity line)]
     (condp = direction
-      :back (vec (concat squashed padding))
-      :forward (vec (concat padding squashed)))))
-
+      :forward (nullspace (accumulate blocks) (count line) :start)
+      :back (nullspace (reverse (accumulate (reverse blocks))) (count line) :end))))
+  
 (defn insert-into-seq-at [insertion sequence index]
   (let [[start finish] (split-at index sequence)]
     (concat start [insertion] finish)))
