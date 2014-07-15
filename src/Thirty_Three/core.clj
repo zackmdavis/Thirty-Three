@@ -98,6 +98,7 @@
             arena
             coordinates-and-new)))
 
+;; TODO (here and elsewhere): infer the value of `n` instead
 (defn vacancies [arena n]
  (filter #(not (lookup arena %))
          (apply cartesian-product (repeat n (range (count arena))))))
