@@ -7,3 +7,7 @@ pom.xml.asc
 *.class
 /.lein-*
 /.nrepl-port
+
+# compiled
+src/Thirty_Three/core.cljs
+thirty-three.js
