@@ -35,14 +35,20 @@
   (is (= (insert-into-seq-at :x (range 5) 2)
          [0 1 :x 2 3 4])))
 
+(deftest can-infer-dimensionality
+  (are [arena n] (= (infer-dimensionality arena) n)
+       (clean-n-arena 1 4) 1
+       (clean-n-arena 2 4) 2
+       (clean-n-arena 3 4) 3))
+
 (deftest can-compute-slicing-coordinates
-  (is (= (slicing-coordinates 1 2 4)
+  (is (= (slicing-coordinates (clean-n-arena 2 4) 1)
          [[0 :*] [1 :*] [2 :*] [3 :*]]))
-  (is (= (slicing-coordinates 0 3 3)
+  (is (= (slicing-coordinates (clean-n-arena 3 3) 0)
          [[:* 0 0] [:* 0 1] [:* 0 2]
           [:* 1 0] [:* 1 1] [:* 1 2]
           [:* 2 0] [:* 2 1] [:* 2 2]])))
 
 (deftest can-report-vacancies
   (is (= [[0 0] [0 1] [0 3] [1 0] [1 1] [1 3] [2 0] [2 1] [2 2] [2 3] [3 1]] 
-         (vacancies realist-two-arena-a 2))))
+         (vacancies realist-two-arena-a))))

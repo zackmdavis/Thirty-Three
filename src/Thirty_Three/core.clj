@@ -9,10 +9,6 @@
     `(vec (for [_# (range ~arena-size)]
             (clean-n-arena ~(dec n) ~arena-size)))))
 
-(def one-arena (clean-n-arena 1 4))
-(def two-arena (clean-n-arena 2 4))
-(def the-arena (clean-n-arena 3 4))
-
 (defn lookup [arena coordinates]
   (reduce (fn [arena-slice coordinate] (arena-slice coordinate))
           arena coordinates))
@@ -83,13 +79,21 @@
   (let [[start finish] (split-at index sequence)]
     (concat start [insertion] finish)))
 
-(defn slicing-coordinates [slicing-dimension n arena-size]
-  (let [bound-coordinates (apply cartesian-product 
+(defn infer-dimensionality [arena]
+  (loop [i 0 level arena]
+    (if (= (type level) (type []))
+      (recur (inc i) (level 0))
+      i)))
+
+(defn slicing-coordinates [arena slicing-dimension]
+  (let [n (infer-dimensionality arena)
+        arena-size (count arena)
+        bound-coordinates (apply cartesian-product 
                                  (repeat (dec n) (range arena-size)))]
     (map #(vec (insert-into-seq-at :* % slicing-dimension)) bound-coordinates)))
 
-(defn slide-arena [arena sliding-dimension n direction]
-  (let [line-coordinates (slicing-coordinates sliding-dimension n (count arena))
+(defn slide-arena [arena sliding-dimension direction]
+  (let [line-coordinates (slicing-coordinates arena sliding-dimension)
         lines (map #(lookup-select arena %) line-coordinates)
         slid-lines (map #(slide-line % direction) lines)
         coordinates-and-new (map vector line-coordinates slid-lines)]
@@ -98,11 +102,11 @@
             arena
             coordinates-and-new)))
 
-;; TODO (here and elsewhere): infer the value of `n` instead
-(defn vacancies [arena n]
- (filter #(not (lookup arena %))
-         (apply cartesian-product (repeat n (range (count arena))))))
-  
-(defn fill-vacancy [arena n]
-  (let [positions (vacancies arena n)]
+(defn vacancies [arena]
+  (let [n (infer-dimensionality arena)]
+    (filter #(not (lookup arena %))
+            (apply cartesian-product (repeat n (range (count arena)))))))
+
+(defn fill-vacancy [arena]
+  (let [positions (vacancies arena)]
     (write arena (rand-nth positions) 1)))
