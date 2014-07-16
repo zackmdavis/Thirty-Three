@@ -15,14 +15,13 @@
                               source)]]
           (.write cljsf output))))
 
+(defn cljsbuild [subtask]
+  (subprocess.call ["lein" "cljsbuild" subtask]))
+
 (if (= __name__ "__main__")
   (do
-   (cljx_of_destitution "src/Thirty_Three/foundation.clj")
-   (cljx_of_destitution "src/Thirty_Three/combinatorics_library.clj")
-   (let [[cljsbuild_option (nth sys.argv 1)]]
-     (try
-      (print (apply subprocess.check_output
-                    [["lein" "cljsbuild" cljsbuild_option]]
-                    {"stderr" subprocess.STDOUT}))
-      (catch [e subprocess.CalledProcessError]
-        (print "ERROR" (or e.output e)))))))
+   (list (map cljx_of_destitution
+              ["src/Thirty_Three/foundation.clj"
+               "src/Thirty_Three/combinatorics_library.clj"]))
+   (let [[subtask (nth sys.argv 1)]]
+     (cljsbuild subtask))))
