@@ -12,22 +12,16 @@
 (swap! game-state #(fdn/write % [0 0] 1))
 (swap! game-state #(fdn/write % [2 2] 1))
 
-(defn line-to-text [i line]
-  (string/join (map (fn [j]
-                      (let [thing (line j)]
-                        (if thing
-                          (str "" thing "|")
-                          "_|")))
-                    (range 4))))
-
-(defn arena-to-text [arena-state]
-  (prn "state " arena-state)
-  (string/join "," (map-indexed line-to-text arena-state)))
+(defn row-component [i row-state]
+  (dom/div #js {:id (str "row" i)} 
+           (string/join " " (map (fn [value] (if value value "_"))
+                                 row-state))))
 
 (defn arena-view [arena-state owner]
   (om/component
-    (dom/div nil
-        (dom/div nil (arena-to-text arena-state)))))
+   (apply dom/div #js {:id "arena-view"}
+          (map-indexed row-component
+                       arena-state))))
 
 (om/root
  arena-view
