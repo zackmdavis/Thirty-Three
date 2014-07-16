@@ -1,5 +1,6 @@
 (ns Thirty-Three.terminal-demo
-  (:require [Thirty-Three.core :refer :all])
+  (:require [Thirty-Three.foundation :refer :all]
+            [Thirty-Three.macro-library :refer :all])
   (:import jline.Terminal))
 
 (def demo-two-arena-atom (atom (clean-n-arena 2 4)))

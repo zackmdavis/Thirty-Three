@@ -1,13 +1,5 @@
-(ns Thirty-Three.core
-  (:require [clojure.math.combinatorics :refer [cartesian-product]]))
-
-(defmacro clean-n-arena [n arena-size]
-  "Create an n-dimensional vector-of-vectors-of-&c. with side length
-   arena-size"
-  (if (= n 0)
-    nil
-    `(vec (for [_# (range ~arena-size)]
-            (clean-n-arena ~(dec n) ~arena-size)))))
+(ns Thirty-Three.foundation
+  (:require [Thirty-Three.combinatorics-library :refer [cartesian-product]]))
 
 (defn lookup [arena coordinates]
   (reduce (fn [arena-slice coordinate] (arena-slice coordinate))
@@ -110,3 +102,5 @@
 (defn fill-vacancy [arena]
   (let [positions (vacancies arena)]
     (write arena (rand-nth positions) 1)))
+
+;(.log js/console "Hello ClojureScript World from foundation.clj[s]!") ; buildscript: cljs
