@@ -13,4 +13,4 @@ src/Thirty_Three/foundation.cljs
 src/Thirty_Three/combinatorics_library.cljs
 
 # compiled
-thirty-three.js
+static/thirty-three.js

@@ -14,6 +14,6 @@
     :builds [{:id "thirty-three"
               :source-paths ["src"]
               :compiler {
-                :output-to "thirty-three.js"
+                :output-to "static/thirty-three.js"
                 :optimizations :none
                 :source-map true}}]})

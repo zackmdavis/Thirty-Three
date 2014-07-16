@@ -12,8 +12,3 @@ h3 {
     height: 33px;
     display: inline-block;
 }
-
-[data-value="1"] {
-    color: #ffffff;
-    background-color:#555555;
-}
