@@ -1,3 +1,19 @@
-.row {
+h3 {
     font-size: 33px; /* obligatory */
+    margin-bottom: 0px;
+}
+
+.row {
+    font-size: 25px;
+}
+
+.tile {
+    width: 33px;
+    height: 33px;
+    display: inline-block;
+}
+
+[data-value="1"] {
+    color: #ffffff;
+    background-color:#555555;
 }

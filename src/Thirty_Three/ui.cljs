@@ -12,15 +12,18 @@
 (swap! game-state #(fdn/write % [0 0] 1))
 (swap! game-state #(fdn/write % [2 2] 1))
 
-(defn row-component [i row-state]
-  (dom/div #js {:id (str "row" i)} 
-           (string/join " " (map (fn [value] (if value value "_"))
-                                 row-state))))
+(defn tile-element [value]
+  (dom/div #js {:className "tile" :data-value value}
+           (if value value "_")))
+
+(defn row-element [i row-state]
+  (apply dom/div #js {:id (str "row" i) :className "row"} 
+         (map tile-element row-state)))
 
 (defn arena-view [arena-state owner]
   (om/component
    (apply dom/div #js {:id "arena-view"}
-          (map-indexed row-component
+          (map-indexed row-element
                        arena-state))))
 
 (om/root
