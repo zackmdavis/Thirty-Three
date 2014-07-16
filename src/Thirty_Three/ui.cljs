@@ -1,8 +1,9 @@
 (ns Thirty-Three.ui
   (:require-macros [Thirty-Three.macro-library :as macros])
-  (:require [Thirty-Three.foundation :as fdn]
+  (:require [clojure.string :as string]
             [om.core :as om :include-macros true]
-            [om.dom :as dom :include-macros true]))
+            [om.dom :as dom :include-macros true]
+            [Thirty-Three.foundation :as fdn]))
 
 (enable-console-print!)
 
@@ -11,28 +12,29 @@
 (swap! game-state #(fdn/write % [0 0] 1))
 (swap! game-state #(fdn/write % [2 2] 1))
 
-;; XXX desperately hacking to get something, anything to "work" in
-;; some sense
 (defn line-to-text [i line]
-  (apply dom/div #js {:id (str "row" i) :className "row"}
-         (map (fn [j]
-                (let [thing (line j)]
-                  (if thing
-                    (str "" thing "|")
-                    "_|")))
-              (range 4))))
+  (string/join (map (fn [j]
+                      (let [thing (line j)]
+                        (if thing
+                          (str "" thing "|")
+                          "_|")))
+                    (range 4))))
+
+(defn arena-to-text [arena-state]
+  (prn "state " arena-state)
+  (string/join "," (map-indexed line-to-text arena-state)))
 
 (defn arena-view [arena-state owner]
   (om/component
     (dom/div nil
-        (dom/div nil (str arena-state)))))
+        (dom/div nil (arena-to-text arena-state)))))
 
 (om/root
  arena-view
  game-state
  {:target (. js/document (getElementById "downtown"))})
 
-(defn actions [direction]
+(def two-actions ; [direction]
   {:left  #(fdn/slide-arena % 1 :back)     
    :right #(fdn/slide-arena % 1 :forward)  
    :up    #(fdn/slide-arena % 0 :back)     
@@ -43,15 +45,10 @@
     (let [button (.getElementById js/document direction)]
          (set! (.-onclick button)
                (fn [e] (do
-                         (prn "click")
-                         (prn "before swap game state" @game-state)
-                         (swap! game-state (fn [s] (str "Game State" direction)))
-                         (prn "after swap game state"  @game-state)))))))
-
-(let [button (.getElementById js/document "test-button")]
-  (set! (.-onclick button)
-        (fn [e] (do
-                  (prn "button clicked")))))
+                         (prn direction " button clicked")
+                         (swap! game-state
+                                (two-actions (keyword direction)))
+                         (swap! game-state fdn/fill-vacancy)))))))
 
 (set-click-handlers)
 (.log js/console "Hello ClojureScript World from ui.cljs")
