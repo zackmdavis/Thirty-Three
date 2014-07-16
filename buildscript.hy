@@ -2,28 +2,23 @@
 (import sys)
 (import re)
 (import subprocess)
-(import shutil)
 
 (defn return_group [match]
   (.group match 1))
 
-(if (= __name__ "__main__")
-  (do
-   ;; improvised cljx: copy foundation.clj with .cljs extension but
-   ;; uncommenting commented lines that end in "; buildscript: cljs"
-   (with [[fdn_clj (open "src/Thirty_Three/foundation.clj")]
-          [fdn_cljs (open "src/Thirty_Three/foundation.cljs" "w")]]
-         (let [[source (.read fdn_clj)]
-               [output (re.sub ";(.*)?; buildscript: cljs\n"
+(defn cljx_of_destitution [filename]
+  (with [[cljf (open filename)]
+         [cljsf (open (+ filename "s") "w")]]
+        (let [[source (.read cljf)]
+              [output (re.sub ";(.*)?; buildscript: cljs\n"
                               return_group
                               source)]]
-           (.write fdn-cljs output)))
-   ;; also the combinatorics library (doesn't actually need changes
-   ;; but TODO could be included in previous context manager for
-   ;; elegance
-   (shutil.copy "src/Thirty_Three/combinatorics_library.clj"
-                "src/Thirty_Three/combinatorics_library.cljs")
+          (.write cljsf output))))
 
+(if (= __name__ "__main__")
+  (do
+   (cljx_of_destitution "src/Thirty_Three/foundation.clj")
+   (cljx_of_destitution "src/Thirty_Three/combinatorics_library.clj")
    (let [[cljsbuild_option (nth sys.argv 1)]]
      (try
       (print (apply subprocess.check_output
