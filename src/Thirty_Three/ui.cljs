@@ -9,12 +9,13 @@
 
 (def game-state
   (atom (macros/clean-n-arena 2 4)))
-(swap! game-state #(fdn/write % [0 0] 1))
-(swap! game-state #(fdn/write % [2 2] 1))
+(doseq [_ (range 2)]
+  (swap! game-state fdn/fill-vacancy))
 
 (defn tile-element [value]
-  (dom/div #js {:className "tile" :data-value value}
-           (if value value "_")))
+  (let [value-maybe (or value "_")]
+    (dom/div #js {:className "tile" :data-value value-maybe}
+             value-maybe)))
 
 (defn row-element [i row-state]
   (apply dom/div #js {:id (str "row" i) :className "row"} 
@@ -22,7 +23,7 @@
 
 (defn arena-view [arena-state owner]
   (om/component
-   (apply dom/div #js {:id "arena-view"}
+   (apply dom/div #js {:id "arena"}
           (map-indexed row-element
                        arena-state))))
 
