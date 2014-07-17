@@ -37,16 +37,17 @@
    :up    #(fdn/slide-arena % 0 :back)     
    :down  #(fdn/slide-arena % 0 :forward)})
 
-(defn set-click-handlers []
-  (doseq [direction ["up" "down" "left" "right"]]
-    (let [button (.getElementById js/document direction)]
-         (set! (.-onclick button)
-               (fn [e] (do
-                         (prn direction " button clicked")
-                         (swap! game-state
-                                (two-actions (keyword direction)))
-                         (swap! game-state fdn/fill-vacancy)))))))
+(def keycodes
+  (merge (zipmap (range 37 41) [:left :up :right :down])
+         {65 :left, 87 :up, 68 :right, 83 :down}))
 
-(set-click-handlers)
-(.log js/console "Hello ClojureScript World from ui.cljs")
+(defn set-keypress-listener! []
+  (.addEventListener js/document "keydown"
+                     (fn [event]
+                       (let [action (two-actions (keycodes (.-keyCode event)))]
+                         (swap! game-state action)
+                         (swap! game-state fdn/fill-vacancy)))))
+
+(set-keypress-listener!)
+(prn "Hello ClojureScript World from ui.cljs")
 (prn @game-state)
