@@ -2,18 +2,29 @@
   <head>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <meta content="utf-8" http-equiv="encoding">
-    <link rel="stylesheet" type="text/css" href="thirty-three.css">
+    <link rel="stylesheet" type="text/css" href="static/thirty-three.css">
+    <link rel="stylesheet" type="text/css" href="static/tiles.css">
     <title>Thirty-Three</title>
   </head>
   <body>
-    <h3 id="title">Thirty-Three</h3> <!-- it sort of has to be an <h3> -->
+    <div>
+      <span id="title"><em>Thirty-Three</em></span>
+      <span id="subtitle">= lg(2048<sup>3</sup>)</span>
+    </div>
     <div id="downtown">
     </div>
     <script src="http://fb.me/react-0.9.0.js"></script>
     <script src="target/cljsbuild-compiler-0/goog/base.js"
 	    type="text/javascript">
     </script>
-    <script src="thirty-three.js" type="text/javascript"></script>
+    <script src="static/thirty-three.js" type="text/javascript"></script>
     <script type="text/javascript">goog.require("Thirty_Three.core");</script>
+    <div id="controls">
+      <p><strong>Controls</strong></p>
+      <p><span class="key">&#11013;</span> or <span class="key">A</span> left</p>
+      <p><span class="key">&#11014;</span> or <span class="key">W</span> up</p>
+      <p><span class="key">&#11015;</span> or <span class="key">S</span> down</p>
+      <p><span class="key">&#10145;</span> or <span class="key">D</span> right</p>
+    </div>
   </body>
 </html>

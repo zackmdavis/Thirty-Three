@@ -1,0 +1,39 @@
+body {
+    background-color:#E0F0E0;
+}
+
+#title {
+    font-size: 33px; /* obligatory */
+    margin-bottom: 0px;
+}
+
+h4 { margin:0px; }
+
+.row {
+    font-size: 25px;
+}
+
+.tile {
+    width: 33px;
+    height: 33px;
+    display: inline-block;
+}
+
+#controls {
+    margin-top: 10px;
+    font-size: 80%;
+    padding: 5px;
+    width: 150px;
+    background-color: #FAFFC7;
+}
+
+.key {
+    font-family: Sans-Serif;
+    padding: 5px;
+    background-color: #000000;
+    color: #ffffff;
+}
+
+[data-value="_"] {
+    background-color: #E0C0E0;
+}
