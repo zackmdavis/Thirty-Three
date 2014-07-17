@@ -12,5 +12,6 @@ pom.xml.asc
 src/Thirty_Three/foundation.cljs
 src/Thirty_Three/combinatorics_library.cljs
 
-# compiled
+# compiled or generated
 static/thirty-three.js
+static/tiles.css
