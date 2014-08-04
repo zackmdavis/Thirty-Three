@@ -12,6 +12,9 @@
 (doseq [_ (range 2)]
   (swap! game-state fdn/fill-vacancy))
 
+(def previous-game-states
+  (atom []))
+
 (defn tile-element [value]
   (let [value-maybe (or value "_")]
     (dom/div #js {:className "tile" :data-value value-maybe}
@@ -36,18 +39,28 @@
   {:left  #(fdn/slide-arena % 1 :back)     
    :right #(fdn/slide-arena % 1 :forward)  
    :up    #(fdn/slide-arena % 0 :back)     
-   :down  #(fdn/slide-arena % 0 :forward)})
+   :down  #(fdn/slide-arena % 0 :forward)
+   :undo  :UNDO})
 
 (def keycodes
   (merge (zipmap (range 37 41) [:left :up :right :down])
-         {65 :left, 87 :up, 68 :right, 83 :down}))
+         {65 :left, 87 :up, 68 :right, 83 :down}
+         {85 :undo}))
 
 (defn set-keypress-listener! []
   (.addEventListener js/document "keydown"
                      (fn [event]
                        (let [action (two-actions (keycodes (.-keyCode event)))]
-                         (swap! game-state action)
-                         (swap! game-state fdn/fill-vacancy)))))
+                         (if-not (= action :UNDO)
+                           (do
+                             (swap! previous-game-states #(conj % @game-state))
+                             (swap! game-state action)
+                             (swap! game-state fdn/fill-vacancy))
+                           (do
+                             (reset! game-state (peek @previous-game-states))
+                             (reset! previous-game-states
+                                     (pop @previous-game-states))))))))
+
 
 (set-keypress-listener!)
 (prn "Hello ClojureScript World from ui.cljs")
