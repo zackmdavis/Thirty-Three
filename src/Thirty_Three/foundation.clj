@@ -5,20 +5,21 @@
   (reduce (fn [arena-slice coordinate] (arena-slice coordinate))
           arena coordinates))
 
-;; XXX retarded
-(defn one-write [arena [x] value]
-  (assoc arena x value))
-(defn two-write [arena [x y] value]
-  (assoc arena x (assoc (arena x) y value)))
-(defn three-write [arena [x y z] value]
-  (assoc arena x (assoc (arena x) y (assoc ((arena x) y) z value))))
+;; Clojure's `butlast` returns nil for an empty collection, so I'm
+;; going to wrap it like this
+(defn vec-butlast [collection]
+  (if (nil? collection)
+    []
+    (vec (butlast collection))))
 
-;; TODO: generalize
+(defn inner-write [arena coordinates value]
+  (assoc (lookup arena (vec-butlast coordinates)) (last coordinates) value))
+
 (defn write [arena coordinates value]
-  (condp = (count coordinates)
-    1 (one-write arena coordinates value)
-    2 (two-write arena coordinates value)
-    3 (three-write arena coordinates value)))
+  (if (= (count coordinates) 1)
+    (inner-write arena coordinates value)
+    (write arena (vec-butlast coordinates)
+                 (inner-write arena coordinates value))))
 
 (defn interpret-wildcard-coordinates [coordinates arena-size]
   (let [wild-indices (filter identity (map-indexed (fn [i c] (if (#{:*} c) i))
@@ -59,14 +60,14 @@
   (let [space (repeat (- arena-size (count blocks)) nil)]
     (condp = side
       :start (concat space blocks)
-      :end (concat blocks space)))) 
+      :end (concat blocks space))))
 
 (defn slide-line [line direction]
   (let [blocks (filter identity line)]
     (condp = direction
       :forward (nullspace (accumulate blocks) (count line) :start)
       :back (nullspace (reverse (accumulate (reverse blocks))) (count line) :end))))
-  
+
 (defn insert-into-seq-at [insertion sequence index]
   (let [[start finish] (split-at index sequence)]
     (concat start [insertion] finish)))
@@ -80,7 +81,7 @@
 (defn slicing-coordinates [arena slicing-dimension]
   (let [n (infer-dimensionality arena)
         arena-size (count arena)
-        bound-coordinates (apply cartesian-product 
+        bound-coordinates (apply cartesian-product
                                  (repeat (dec n) (range arena-size)))]
     (map #(vec (insert-into-seq-at :* % slicing-dimension)) bound-coordinates)))
 
