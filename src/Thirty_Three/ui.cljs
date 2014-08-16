@@ -35,12 +35,22 @@
  game-state
  {:target (. js/document (getElementById "downtown"))})
 
+(defn slide! [state previous-states sliding-dimension direction]
+  (swap! previous-states #(conj % @game-state))
+  (swap! game-state #(fdn/slide-arena % sliding-dimension direction))
+  (swap! game-state fdn/fill-vacancy))
+
+(defn undo! [state previous-states]
+  (reset! state (peek @previous-states))
+  (reset! previous-states
+          (pop @previous-states)))
+
 (def two-actions ; [direction]
-  {:left  #(fdn/slide-arena % 1 :back)     
-   :right #(fdn/slide-arena % 1 :forward)  
-   :up    #(fdn/slide-arena % 0 :back)     
-   :down  #(fdn/slide-arena % 0 :forward)
-   :undo  :UNDO})
+  {:left  #(slide! %1 %2 1 :back)     
+   :right #(slide! %1 %2 1 :forward)  
+   :up    #(slide! %1 %2 0 :back)     
+   :down  #(slide! %1 %2 0 :forward)
+   :undo  undo!})
 
 (def keycodes
   (merge (zipmap (range 37 41) [:left :up :right :down])
@@ -48,19 +58,11 @@
          {85 :undo}))
 
 (defn set-keypress-listener! []
-  (.addEventListener js/document "keydown"
-                     (fn [event]
-                       (let [action (two-actions (keycodes (.-keyCode event)))]
-                         (if-not (= action :UNDO)
-                           (do
-                             (swap! previous-game-states #(conj % @game-state))
-                             (swap! game-state action)
-                             (swap! game-state fdn/fill-vacancy))
-                           (do
-                             (reset! game-state (peek @previous-game-states))
-                             (reset! previous-game-states
-                                     (pop @previous-game-states))))))))
-
+  (.addEventListener 
+   js/document "keydown"
+   (fn [event]
+     (when-let [action! (two-actions (keycodes (.-keyCode event)))]
+       (action! game-state previous-game-states)))))
 
 (set-keypress-listener!)
 (prn "Hello ClojureScript World from ui.cljs")
