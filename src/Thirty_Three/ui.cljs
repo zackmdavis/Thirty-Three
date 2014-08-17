@@ -39,21 +39,21 @@
  {:target (. js/document (getElementById "downtown"))})
 
 (defn slide! [state previous-states sliding-dimension direction]
-  (swap! previous-states #(conj % @game-state))
-  (swap! game-state #(fdn/slide-arena % sliding-dimension direction))
-  (swap! game-state fdn/fill-vacancy))
+  (swap! previous-states #(conj % @state))
+  (swap! state #(fdn/slide-arena % sliding-dimension direction))
+  (when (seq (fdn/vacancies @state))
+    (swap! state fdn/fill-vacancy)))
 
 (defn undo! [state previous-states]
-  (reset! state (peek @previous-states))
-  (reset! previous-states
-          (pop @previous-states)))
+  (when (peek @previous-states)
+    (reset! state (peek @previous-states))
+    (reset! previous-states (pop @previous-states))))
 
 (defn resize! [state previous-states delta]
   (when-let [arena-size (count @state)]
     (reset! state (macros/clean-n-arena 2 (+ arena-size delta)))
     (seed! state 2))
   (reset! previous-states []))
-
 
 (def two-actions ; [direction]
   {:left  #(slide! %1 %2 1 :back)     
@@ -68,7 +68,7 @@
   (merge (zipmap (range 37 41) [:left :up :right :down])
          {65 :left, 87 :up, 68 :right, 83 :down}
          {85 :undo}
-         {109 :contract 189 :contract 107 :expand 187 :expand}))
+         {109 :contract, 189 :contract, 107 :expand, 187 :expand}))
 
 (defn set-keypress-listener! []
   (.addEventListener 
