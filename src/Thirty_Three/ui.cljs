@@ -7,10 +7,13 @@
 
 (enable-console-print!)
 
+(defn seed! [state j]
+  (doseq [_ (range j)]
+    (swap! state fdn/fill-vacancy)))
+
 (def game-state
   (atom (macros/clean-n-arena 2 4)))
-(doseq [_ (range 2)]
-  (swap! game-state fdn/fill-vacancy))
+(seed! game-state 2)
 
 (def previous-game-states
   (atom []))
@@ -45,17 +48,27 @@
   (reset! previous-states
           (pop @previous-states)))
 
+(defn resize! [state previous-states delta]
+  (when-let [arena-size (count @state)]
+    (reset! state (macros/clean-n-arena 2 (+ arena-size delta)))
+    (seed! state 2))
+  (reset! previous-states []))
+
+
 (def two-actions ; [direction]
   {:left  #(slide! %1 %2 1 :back)     
    :right #(slide! %1 %2 1 :forward)  
    :up    #(slide! %1 %2 0 :back)     
    :down  #(slide! %1 %2 0 :forward)
-   :undo  undo!})
+   :undo  undo!
+   :expand   #(resize! %1 %2 +1)
+   :contract #(resize! %1 %2 -1)})
 
 (def keycodes
   (merge (zipmap (range 37 41) [:left :up :right :down])
          {65 :left, 87 :up, 68 :right, 83 :down}
-         {85 :undo}))
+         {85 :undo}
+         {109 :contract 189 :contract 107 :expand 187 :expand}))
 
 (defn set-keypress-listener! []
   (.addEventListener 
