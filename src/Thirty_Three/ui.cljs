@@ -11,11 +11,11 @@
   (doseq [_ (range j)]
     (swap! state fdn/fill-vacancy)))
 
-(def dimensionality 2)
+(def dimensionality 3)
 
 (def game-state
-  (atom (macros/clean-n-arena 2 4)))
-(seed! game-state 2)
+  (atom (macros/clean-n-arena 3 4)))
+(seed! game-state 4)
 
 (def previous-game-states
   (atom []))
@@ -36,7 +36,7 @@
 (defn arena-view [arena-state owner]
   (condp = dimensionality
     2 (om/component
-       (apply dom/div #js {:id "arena"}
+       (apply dom/div #js {:id "two-arena" :className "level"}
               (map-indexed row-element
                            arena-state)))
     3 (om/component
@@ -61,10 +61,15 @@
     (reset! previous-states (pop @previous-states))))
 
 (defn resize! [state previous-states delta]
-  (when-let [arena-size (count @state)]
-    (reset! state (macros/clean-n-arena 2 (+ arena-size delta)))
-    (seed! state 2))
-  (reset! previous-states []))
+  (condp = dimensionality
+    ;; XXX TODO FIXME: investigate possible brokenness of clean-n-arena
+    2 (when-let [arena-size (count @state)]
+        (reset! state (macros/clean-n-arena 2 (+ arena-size delta)))
+        (seed! state 2))
+    3 (when-let [arena-size (count @state)]
+        (reset! state (macros/clean-n-arena 3 (+ arena-size delta)))
+        (seed! state 3)))
+    (reset! previous-states []))
 
 (defn alter-dimensionality! [state previous-states n]
   (condp = n
@@ -99,6 +104,8 @@
    :west  #(slide! %1 %2 0 :back)
    :east  #(slide! %1 %2 0 :forward)
    :undo  undo!
+   :expand   #(resize! %1 %2 +1)
+   :contract #(resize! %1 %2 -1)
    :two-alter #(alter-dimensionality! %1 %2 2)})
 
 (def keycodes
