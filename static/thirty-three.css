@@ -9,6 +9,11 @@ body {
 
 h4 { margin:0px; }
 
+.level {
+    margin: 5px;
+    display: inline-block;
+}
+
 .row {
     font-size: 25px;
 }
