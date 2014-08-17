@@ -68,7 +68,7 @@
         (seed! state 2))
     3 (when-let [arena-size (count @state)]
         (reset! state (macros/clean-n-arena 3 (+ arena-size delta)))
-        (seed! state 3)))
+        (seed! state 4)))
     (reset! previous-states []))
 
 (defn alter-dimensionality! [state previous-states n]
@@ -83,7 +83,7 @@
     3 (do
         (def dimensionality 3)
         (reset! state (macros/clean-n-arena 3 4))
-        (seed! state 3)
+        (seed! state 4)
         (reset! previous-states []))))
 
 (def two-actions
