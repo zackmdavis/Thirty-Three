@@ -40,14 +40,6 @@
             arena
             (map vector locations values))))
 
-(defn squash [done todo]
-  (if (empty? todo)
-    done
-    (if (= (last done) (first todo))
-      (recur (assoc done (dec (count done)) (inc (first todo)))
-             (rest todo))
-      (recur (conj done (first todo)) (rest todo)))))
-
 (defn accumulate [blocks]
   (reduce (fn [done incoming]
             (if (= (last done) incoming)

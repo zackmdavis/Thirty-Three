@@ -9,10 +9,6 @@
 (def realist-two-arena-a
   [[nil nil 1 nil] [nil nil 1 nil] [nil nil nil nil] [2 nil 1 1]])
 
-(deftest can-squash
-  (is (= [2 2]
-         (squash [] [2 1 1]))))
-
 (deftest can-write
   (is (= (write (clean-n-arena 2 2) [1 1] :a)
          [[nil nil] [nil :a]]))
@@ -51,5 +47,5 @@
           [:* 2 0] [:* 2 1] [:* 2 2]])))
 
 (deftest can-report-vacancies
-  (is (= [[0 0] [0 1] [0 3] [1 0] [1 1] [1 3] [2 0] [2 1] [2 2] [2 3] [3 1]] 
+  (is (= [[0 0] [0 1] [0 3] [1 0] [1 1] [1 3] [2 0] [2 1] [2 2] [2 3] [3 1]]
          (vacancies realist-two-arena-a))))
