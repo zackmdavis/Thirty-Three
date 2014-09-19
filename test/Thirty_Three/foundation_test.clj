@@ -1,13 +1,18 @@
 (ns Thirty-Three.foundation-test
   (:require [clojure.test :refer :all]
-            [Thirty-Three.foundation :refer :all]
-            [Thirty-Three.macro-library :refer :all]))
+            [Thirty-Three.foundation :refer :all]))
 
 (def marked-two-arena
   [[:a :b :c] [:d :e :f] [:g :h :i]])
 
 (def realist-two-arena-a
   [[nil nil 1 nil] [nil nil 1 nil] [nil nil nil nil] [2 nil 1 1]])
+
+(deftest can-make-clean-n-arena
+  (is (= (clean-n-arena 2 2)
+         [[nil nil] [nil nil]]))
+  (is (= (clean-n-arena 3 2)
+         [[[nil nil] [nil nil]] [[nil nil] [nil nil]]])))
 
 (deftest can-write
   (is (= (write (clean-n-arena 2 2) [1 1] :a)

@@ -1,6 +1,12 @@
 (ns Thirty-Three.foundation
   (:require [Thirty-Three.combinatorics-library :refer [cartesian-product]]))
 
+(defn clean-n-arena [n arena-size]
+  (if (= n 1)
+    (vec (for [_ (range arena-size)] nil))
+    (let [level-below (clean-n-arena (dec n) arena-size)]
+      (vec (for [_ (range arena-size)] level-below)))))
+
 (defn lookup [arena coordinates]
   (reduce (fn [arena-slice coordinate] (arena-slice coordinate))
           arena coordinates))

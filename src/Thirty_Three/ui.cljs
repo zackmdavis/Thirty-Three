@@ -1,5 +1,4 @@
 (ns Thirty-Three.ui
-  (:require-macros [Thirty-Three.macro-library :as macros])
   (:require [clojure.string :as string]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
@@ -14,7 +13,7 @@
 (def dimensionality 3)
 
 (def game-state
-  (atom (macros/clean-n-arena 3 4)))
+  (atom (fdn/clean-n-arena 3 4)))
 (seed! game-state 4)
 
 (def previous-game-states
@@ -26,7 +25,7 @@
              value-maybe)))
 
 (defn row-element [j row-state]
-  (apply dom/div #js {:id (str "row" j) :className "row"} 
+  (apply dom/div #js {:id (str "row" j) :className "row"}
          (map tile-element row-state)))
 
 (defn level-element [i level-state]
@@ -64,10 +63,10 @@
   (condp = dimensionality
     ;; XXX TODO FIXME: investigate possible brokenness of clean-n-arena
     2 (when-let [arena-size (count @state)]
-        (reset! state (macros/clean-n-arena 2 (+ arena-size delta)))
+        (reset! state (fdn/clean-n-arena 2 (+ arena-size delta)))
         (seed! state 2))
     3 (when-let [arena-size (count @state)]
-        (reset! state (macros/clean-n-arena 3 (+ arena-size delta)))
+        (reset! state (fdn/clean-n-arena 3 (+ arena-size delta)))
         (seed! state 4)))
     (reset! previous-states []))
 
@@ -77,19 +76,19 @@
         ;; XXX TODO FIXME: investigate whether and how clean-n-arena
         ;; is broken so that this can be a function
         (def dimensionality 2)
-        (reset! state (macros/clean-n-arena 2 4))
+        (reset! state (fdn/clean-n-arena 2 4))
         (seed! state 2)
         (reset! previous-states []))
     3 (do
         (def dimensionality 3)
-        (reset! state (macros/clean-n-arena 3 4))
+        (reset! state (fdn/clean-n-arena 3 4))
         (seed! state 4)
         (reset! previous-states []))))
 
 (def two-actions
-  {:left  #(slide! %1 %2 1 :back)     
-   :right #(slide! %1 %2 1 :forward)  
-   :up    #(slide! %1 %2 0 :back)     
+  {:left  #(slide! %1 %2 1 :back)
+   :right #(slide! %1 %2 1 :forward)
+   :up    #(slide! %1 %2 0 :back)
    :down  #(slide! %1 %2 0 :forward)
    :undo  undo!
    :expand   #(resize! %1 %2 +1)
@@ -97,9 +96,9 @@
    :three-alter #(alter-dimensionality! %1 %2 3)})
 
 (def three-actions
-  {:left  #(slide! %1 %2 2 :back)     
-   :right #(slide! %1 %2 2 :forward)  
-   :up    #(slide! %1 %2 1 :back)     
+  {:left  #(slide! %1 %2 2 :back)
+   :right #(slide! %1 %2 2 :forward)
+   :up    #(slide! %1 %2 1 :back)
    :down  #(slide! %1 %2 1 :forward)
    :west  #(slide! %1 %2 0 :back)
    :east  #(slide! %1 %2 0 :forward)
@@ -116,7 +115,7 @@
          {219 :two-alter, 221 :three-alter}))
 
 (defn set-keypress-listener! []
-  (.addEventListener 
+  (.addEventListener
    js/document "keydown"
    (fn [event]
      (condp = dimensionality
