@@ -6,6 +6,9 @@
 
 (enable-console-print!)
 
+(defn seed-size [n arena-size]
+  (* 2 (Math/pow 4 (- n 2))))
+
 (defn seed! [state j]
   (doseq [_ (range j)]
     (swap! state fdn/fill-vacancy)))
@@ -14,7 +17,7 @@
 
 (def game-state
   (atom (fdn/clean-n-arena 3 4)))
-(seed! game-state 4)
+(seed! game-state (seed-size 3 4))
 
 (def previous-game-states
   (atom []))
@@ -60,30 +63,18 @@
     (reset! previous-states (pop @previous-states))))
 
 (defn resize! [state previous-states delta]
-  (condp = dimensionality
-    ;; XXX TODO FIXME: investigate possible brokenness of clean-n-arena
-    2 (when-let [arena-size (count @state)]
-        (reset! state (fdn/clean-n-arena 2 (+ arena-size delta)))
-        (seed! state 2))
-    3 (when-let [arena-size (count @state)]
-        (reset! state (fdn/clean-n-arena 3 (+ arena-size delta)))
-        (seed! state 4)))
-    (reset! previous-states []))
+  (when-let [arena-size (count @state)]
+    (let [n (fdn/infer-dimensionality @state)]
+      (reset! state (fdn/clean-n-arena n (+ arena-size delta)))
+      (seed! state (seed-size n arena-size))))
+  (reset! previous-states []))
 
 (defn alter-dimensionality! [state previous-states n]
-  (condp = n
-    2 (do
-        ;; XXX TODO FIXME: investigate whether and how clean-n-arena
-        ;; is broken so that this can be a function
-        (def dimensionality 2)
-        (reset! state (fdn/clean-n-arena 2 4))
-        (seed! state 2)
-        (reset! previous-states []))
-    3 (do
-        (def dimensionality 3)
-        (reset! state (fdn/clean-n-arena 3 4))
-        (seed! state 4)
-        (reset! previous-states []))))
+  (def dimensionality n)
+  (let [arena-size (count @state)]
+    (reset! state (fdn/clean-n-arena n arena-size))
+    (seed! state (seed-size n arena-size)))
+  (reset! previous-states []))
 
 (def two-actions
   {:left  #(slide! %1 %2 1 :back)
