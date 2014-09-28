@@ -14,48 +14,47 @@
 (defn undiffract [rgb]
   (.join "" (map (fn [c] (.zfill (slice (hex (int c)) 2) 2)) rgb)))
 
-(defn weighted_average_diffracted [rgb1 rgb2 weighing]
+(defn interpolate [rgb1 rgb2 weighing]
   (list (map (fn [c1 c2]
                (+ c1 (* weighing (- c2 c1))))
              rgb1 rgb2)))
 
-(defn color_stop_interpolate [color_stops x]
+(defn interpolate_stop [color_stops x]
   (let [[stops (sorted (.keys color_stops))]
         [closest_above (min (filter (fn [stop] (> (- stop x) 0)) stops))]
-        [closest_below (max (filter (fn [stop] (< (- stop x) 0)) stops))]]
-    (undiffract
-     (apply weighted_average_diffracted
-            (itertools.chain (list (map (fn [k] (diffract (get color_stops k)))
-                                        [closest_below closest_above]))
-                             [(/ (- x closest_below)
-                                 (- closest_above closest_below))])))))
+        [closest_below (max (filter (fn [stop] (< (- stop x) 0)) stops))]
+        [diffracted_above (diffract (.get color_stops closest_above))]
+        [diffracted_below (diffract (.get color_stops closest_below))]
+        [weighting (/ (- x closest_below) (- closest_above closest_below))]]
+    (undiffract (interpolate diffracted_below diffracted_above weighting))))
 
-(defn stile_block [value color]; (sic)
+(defn populate_stops
+  [color_stops]
+  (let [[values (range (min (.keys color_stops)) (max (.keys color_stops)))]
+        [full_stops (.copy color_stops)]]
+    (for [value values]
+      (if (not-in value color_stops)
+        (assoc full_stops value (interpolate_stop color_stops value))))
+    full_stops))
+
+(defn stile_block ; (sic)
+  [value color]
   (.join "\n"
          [(.format "[data-value=\"{}\"] {{" value)
           "    color: #ffffff;"
           (.format "    background-color: #{};" color)
           "}\n"]))
 
-(defn build_stilesheet ; (sic)
-  [color_stops start end]
-  (let [[values (range start end)]
-        [colors (dict-comp value
-                           (.get color_stops value
-                                 (color_stop_interpolate
-                                  color_stops value))
-                           [value values])]]
-    (.join "\n"
-           (list-comp (stile_block value (get colors value)) [value values]))))
+(defn stilesheet ; (sic)
+  [color_stops]
+  (let [[colors (populate_stops color_stops)]]
+    (.join "\n" (list-comp (stile_block value color)
+                           [[value color] (.items colors)]))))
 
 (defn write_stilesheet! ; (sic)
-  [color_stops start end]
+  [color_stops]
   (with [[tiles_css (open "static/tiles.css" "w")]]
-        (.write tiles_css (+ (stile_block 1 "2020B0") "\n"
-                             ; ^ XXX TODO FIXME this is not actually
-                             ; the right way to deal with an
-                             ; off-by-one error elsewhere
-                             (build_stilesheet color_stops start end)))))
+        (.write tiles_css (stilesheet color_stops))))
 
 (defn return_group [match]
   (.group match 1))
@@ -77,6 +76,6 @@
    (list (map cljx_of_destitution
               ["src/Thirty_Three/foundation.clj"
                "src/Thirty_Three/combinatorics_library.clj"]))
-   (write_stilesheet! {1 "2020B0" 8 "B02020" 14 "D0D0D0"} 2 14)
+   (write_stilesheet! {1 "2020B0" 8 "B02020" 14 "D0D0D0"})
    (let [[subtask (nth sys.argv 1)]]
      (cljsbuild subtask))))

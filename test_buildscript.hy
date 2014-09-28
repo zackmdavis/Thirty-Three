@@ -13,15 +13,32 @@
       (self.assertEqual (buildscript.undiffract [127 2 255])
                         "7f02ff"))]
 
-   [test_weighted_average_diffracted
+   [test_interpolate
     (fn [self]
-      (self.assertEqual (buildscript.weighted_average_diffracted [0 0 0] [254 254 254] .5)
+      (self.assertEqual (buildscript.interpolate [0 0 0] [254 254 254] .5)
                         [127 127 127]))]
 
-   [test_color_stop_interpolate
+   [test_interpolate_stop
     (fn [self]
-      (self.assertEqual (buildscript.color_stop_interpolate
+      (self.assertEqual (buildscript.interpolate_stop
                          {1 "000000" 3 "fefefe"} 2)
                         "7f7f7f"))]
-   
-])
+
+   [test_stilesheet
+    (fn [self]
+      (self.assertEqual (buildscript.stilesheet {1 "000000" 3 "fefefe"})
+       "[data-value=\"1\"] {
+    color: #ffffff;
+    background-color: #000000;
+}
+
+[data-value=\"2\"] {
+    color: #ffffff;
+    background-color: #7f7f7f;
+}
+
+[data-value=\"3\"] {
+    color: #ffffff;
+    background-color: #fefefe;
+}
+"))]])
