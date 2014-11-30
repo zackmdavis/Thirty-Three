@@ -1,4 +1,5 @@
 (ns Thirty-Three.ui
+  (:use [jayq.core :only [$]])
   (:require [clojure.string :as string]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
@@ -118,3 +119,5 @@
 (set-keypress-listener!)
 (prn "Hello ClojureScript World from ui.cljs")
 (prn @game-state)
+
+(prn "Hello jQuery world" ($ :body))
