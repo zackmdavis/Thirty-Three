@@ -41,8 +41,8 @@
   [value color]
   (.join "\n"
          [(.format "[data-value=\"{}\"] {{" value)
-          "    color: #ffffff;"
-          (.format "    background-color: #{};" color)
+          "  color: #ffffff;"
+          (.format "  background-color: #{};" color)
           "}\n"]))
 
 (defn stilesheet ; (sic)
@@ -71,8 +71,8 @@
 (defn cljsbuild [subtask]
   (subprocess.call ["lein" "cljsbuild" subtask]))
 
-(def tile_color_parameters {1 "2020B0" 8 "B02020"
-                            14 "F0C0D0"21 "D0C0F0" 31 "C0C0C0"})
+(def tile_color_parameters {1 "2020B0"  8 "B02020"
+                            14 "F04590" 21 "9070F0" 31 "A0A0A0"})
 
 (when (= __name__ "__main__")
   (if (= (nth sys.argv 1) "--only-stilesheet")

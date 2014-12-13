@@ -55,4 +55,5 @@ h4 { margin:0px; }
 
 [data-value="_"] {
   background-color: #E0C0E0;
+  transition: all 0.2s;
 }
