@@ -41,16 +41,16 @@ h4 { margin:0px; }
   color: #ffffff;
 }
 
-.available-key {
+.available .key {
   background-color: #000000;
 }
 
-.unavailable-key {
-  background-color: #909090;
+.unavailable .key {
+  background-color: #A0A0A0;
 }
 
-.unavailable-label {
-  color: #707070;
+.unavailable .label {
+  color: #909090;
 }
 
 [data-value="_"] {
