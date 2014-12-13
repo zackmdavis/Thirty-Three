@@ -1,4 +1,5 @@
 (ns Thirty-Three.ui
+  (:use [jayq.core :only [$ html add-class remove-class]])
   (:require [clojure.string :as string]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
@@ -98,6 +99,30 @@
    :contract #(resize! %1 %2 -1)
    :two-alter #(alter-dimensionality! %1 %2 2)})
 
+(def dimensionality-to-actions
+  {2 two-actions
+   3 three-actions})
+
+(def all-actions
+  (set (apply concat (map keys [two-actions three-actions]))))
+
+(defn other-availability? [action]
+  ((or ({:undo (fn [] (not (empty? @previous-game-states)))} action)
+      (fn [] true))))
+
+(defn label-availability! []
+  (doseq [action all-actions]
+    (let [$action ($ (str "." (name action)))
+          active (and (not (nil? ((dimensionality-to-actions dimensionality)
+                                  action)))
+                      (other-availability? action))
+          [class-to-add class-to-remove] (if active
+                                           ["available" "unavailable"]
+                                           ["unavailable" "available"])]
+      (prn action active class-to-add class-to-remove)
+      (add-class $action class-to-add)
+      (remove-class $action class-to-remove))))
+
 (def keycodes
   (merge (zipmap (range 37 41) [:left :up :right :down])
          {65 :left, 87 :up, 68 :right, 83 :down, 81 :west, 69 :east}
@@ -109,12 +134,10 @@
   (.addEventListener
    js/document "keydown"
    (fn [event]
-     (condp = dimensionality
-       2 (when-let [action! (two-actions (keycodes (.-keyCode event)))]
-           (action! game-state previous-game-states))
-       3 (when-let [action! (three-actions (keycodes (.-keyCode event)))]
-           (action! game-state previous-game-states))))))
+     (let [actions (dimensionality-to-actions dimensionality)]
+       (when-let [action! (actions (keycodes (.-keyCode event)))]
+          (action! game-state previous-game-states)
+          (label-availability!))))))
 
 (set-keypress-listener!)
 (prn "Hello ClojureScript World from ui.cljs")
-(prn @game-state)
