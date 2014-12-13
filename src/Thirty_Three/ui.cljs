@@ -75,8 +75,7 @@
   (let [arena-size (count @state)]
     (reset! state (fdn/clean-n-arena n arena-size))
     (seed! state (seed-size n arena-size)))
-  (reset! previous-states [])
- (label-availability!))
+  (reset! previous-states []))
 
 (def two-actions
   {:left  #(slide! %1 %2 1 :back)
@@ -107,13 +106,16 @@
 (def all-actions
   (set (apply concat (map keys [two-actions three-actions]))))
 
-(def ancillary-availability-ps
-  {:undo (fn [] (not (empty? @previous-game-states)))})
+(defn other-availability? [action]
+  ((or ({:undo (fn [] (not (empty? @previous-game-states)))} action)
+      (fn [] true))))
 
 (defn label-availability! []
   (doseq [action all-actions]
     (let [$action ($ (str "." (name action)))
-          active (not (nil? ((dimensionality-to-actions dimensionality) action)))
+          active (and (not (nil? ((dimensionality-to-actions dimensionality)
+                                  action)))
+                      (other-availability? action))
           [class-to-add class-to-remove] (if active
                                            ["available" "unavailable"]
                                            ["unavailable" "available"])]
@@ -132,11 +134,10 @@
   (.addEventListener
    js/document "keydown"
    (fn [event]
-     (condp = dimensionality
-       2 (when-let [action! (two-actions (keycodes (.-keyCode event)))]
-           (action! game-state previous-game-states))
-       3 (when-let [action! (three-actions (keycodes (.-keyCode event)))]
-           (action! game-state previous-game-states))))))
+     (let [actions (dimensionality-to-actions dimensionality)]
+       (when-let [action! (actions (keycodes (.-keyCode event)))]
+          (action! game-state previous-game-states)
+          (label-availability!))))))
 
 (set-keypress-listener!)
 (prn "Hello ClojureScript World from ui.cljs")
