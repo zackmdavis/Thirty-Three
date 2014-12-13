@@ -71,11 +71,16 @@
 (defn cljsbuild [subtask]
   (subprocess.call ["lein" "cljsbuild" subtask]))
 
+(def tile_color_parameters {1 "2020B0" 8 "B02020"
+                            14 "F0C0D0"21 "D0C0F0" 31 "C0C0C0"})
+
 (when (= __name__ "__main__")
-  (do
-   (list (map cljx_of_destitution
-              ["src/Thirty_Three/foundation.clj"
-               "src/Thirty_Three/combinatorics_library.clj"]))
-   (write_stilesheet! {1 "2020B0" 8 "B02020" 14 "D0D0D0"})
-   (let [[subtask (nth sys.argv 1)]]
-     (cljsbuild subtask))))
+  (if (= (nth sys.argv 1) "--only-stilesheet")
+    (write_stilesheet! tile_color_parameters)
+    (do
+     (list (map cljx_of_destitution
+                ["src/Thirty_Three/foundation.clj"
+                 "src/Thirty_Three/combinatorics_library.clj"]))
+     (write_stilesheet! tile_color_parameters)
+     (let [[subtask (nth sys.argv 1)]]
+       (cljsbuild subtask)))))
