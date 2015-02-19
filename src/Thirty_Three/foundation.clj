@@ -8,24 +8,10 @@
       (vec (for [_ (range arena-size)] level-below)))))
 
 (defn lookup [arena coordinates]
-  (reduce (fn [arena-slice coordinate] (arena-slice coordinate))
-          arena coordinates))
-
-;; Clojure's `butlast` returns nil for an empty collection, so I'm
-;; going to wrap it like this
-(defn vec-butlast [collection]
-  (if (nil? collection)
-    []
-    (vec (butlast collection))))
-
-(defn inner-write [arena coordinates value]
-  (assoc (lookup arena (vec-butlast coordinates)) (last coordinates) value))
+  (get-in arena coordinates))
 
 (defn write [arena coordinates value]
-  (if (= (count coordinates) 1)
-    (inner-write arena coordinates value)
-    (write arena (vec-butlast coordinates)
-                 (inner-write arena coordinates value))))
+  (assoc-in arena coordinates value))
 
 (defn interpret-wildcard-coordinates [coordinates arena-size]
   (let [wild-indices (filter identity (map-indexed (fn [i c] (if (#{:*} c) i))
